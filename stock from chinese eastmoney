@@ -1,0 +1,51 @@
+Sub stock()
+    Dim url As String
+    Dim strText As String
+    Dim HTML, Window
+    Dim l As Integer
+    Dim s
+    
+    
+    url = "http://ff.eastmoney.com//EM_CapitalFlowInterface/api/js?type=hff&rtntype=2&js=({data:[(x)]})&cb=var%20aff_data=&check=TMLBMSPROCR&acces_token=1942f5da9b46b069953c873404aad4b5&id=" & Range("N1").value
+        
+    With CreateObject("MSXML2.XMLHTTP")
+        .Open "GET", url, False
+        .setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
+        .setRequestHeader "Referer", "http://data.eastmoney.com/zjlx/detail.html"
+        .setRequestHeader "User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"
+        .Send
+        strText = .responsetext
+    End With
+    
+    strText = Replace(Replace(strText, "(", ""), ")", "")
+    strText = Replace(strText, "{data:", "{""data"":")
+    
+    
+    Set HTML = CreateObject("htmlfile")
+    Set Window = HTML.parentwindow
+    Window.execScript strText
+    
+    l = Window.eval("aff_data.data[0].length")
+    
+    For i = 0 To l - 1
+        s = Split(Window.eval("aff_data.data[0][" & i & " ]"), ",")
+        Cells(3, 1) = s(0)
+        Cells(3, 2) = s(11)
+        Cells(3, 3) = s(12)
+        Cells(3, 4) = s(1)
+        Cells(3, 5) = s(2)
+        Cells(3, 6) = s(3)
+        Cells(3, 7) = s(4)
+        Cells(3, 8) = s(5)
+        Cells(3, 9) = s(6)
+        Cells(3, 10) = s(7)
+        Cells(3, 11) = s(8)
+        Cells(3, 12) = s(9)
+        Cells(3, 13) = s(10)
+        
+        Rows(3).Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+    Next
+    
+    MsgBox "OK"
+    
+End Sub
